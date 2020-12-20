@@ -1,0 +1,18 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.28307.1321
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "MODBUS_TCP", "MODBUS_TCP\MODBUS_TCP.shproj", "{D5E00ED6-CAC4-4009-B558-96A195CC1C3C}"
+EndProject
+Global
+	GlobalSection(SharedMSBuildProjectFiles) = preSolution
+		MODBUS_TCP\MODBUS_TCP.projitems*{d5e00ed6-cac4-4009-b558-96a195cc1c3c}*SharedItemsImports = 13
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {697264E1-48B1-4B79-96E6-735F20E9E393}
+	EndGlobalSection
+EndGlobal
