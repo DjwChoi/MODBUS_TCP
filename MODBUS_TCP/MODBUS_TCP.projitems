@@ -10,5 +10,6 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="$(MSBuildThisFileDirectory)Master.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Modbus.cs" />
   </ItemGroup>
 </Project>
