@@ -4,7 +4,6 @@ using System.Net.Sockets;
 
 namespace MODBUS_TCP
 {
-
     enum ExceptionCode
     {
         IllegalFunction,
@@ -34,9 +33,6 @@ namespace MODBUS_TCP
 
         public delegate void ReceivedData(byte[] data);
         public event ReceivedData OnReceivedData;
-
-        public delegate void SendData(byte[] data);
-        public event SendData OnSendData;
 
         public delegate void ExceptionData(ushort id, byte unit, byte function, ExceptionCode exception);
         public event ExceptionData OnException;
@@ -120,7 +116,6 @@ namespace MODBUS_TCP
         internal void CallException(ushort id, byte unit, byte function, byte exception)
         {
             if (mSocket == null) return;
-            if (exception == ExceptionCode.ConnectionLost) mSocket == null;
             if (OnException != null) OnException(id, unit, function, exception);
         }
 
@@ -146,12 +141,9 @@ namespace MODBUS_TCP
 
             try
             {
-                int size = mSocket.EndSend(result);
-                if (result.IsCompleted == false) CallException(0xFFFF, 0xFF, 0xFF, ExceptionCode.SendFailt);
+                mSocket.EndSend(result);
             }
             catch (Exception) { }
-
-            OnSendData(mBuffer);
         }
 
         private void OnReceived(IAsyncResult result)
@@ -161,11 +153,17 @@ namespace MODBUS_TCP
             try
             {
                 mSocket.EndReceive(result);
+
+                if (isTransactionID[mBuffer[0]] == true) isTransactionID[mBuffer[0]] = false;
+
                 if (result.IsCompleted == false) CallException(0xFF, 0xFF, 0xFF, ExceptionCode.ConnectionLost);
+                else OnResponseData(mBuffer.Clone());
+
+                Array.Clear(mBuffer, 0, mBuffer.lenght);
+
+                this.socket.BeginReceive(mBuffer, 0, mBuffer.Length, SocketFlags.None, new AsyncCallback(OnReceived), mSocket);
             }
             catch (Exception) { }
-
-            OnResponseData(mBuffer);
         }
 
         private void WriteData(byte[] write_data)
