@@ -4,7 +4,7 @@ using System.Net.Sockets;
 
 namespace MODBUS_TCP
 {
-    enum ExceptionCode
+    public enum ExceptionCode
     {
         IllegalFunction,
         IllegalDataAdr,
@@ -60,7 +60,7 @@ namespace MODBUS_TCP
 
         public Master(string ip, ushort port)
         {
-            connect(ip, port);
+            Connect(ip, port);
         }
 
         public void Connect(string ip, ushort port)
@@ -113,37 +113,10 @@ namespace MODBUS_TCP
             }
         }
 
-        internal void CallException(ushort id, byte unit, byte function, byte exception)
+        internal void CallException(byte id, byte unit, byte function, ExceptionCode exception)
         {
             if (mSocket == null) return;
             if (OnException != null) OnException(id, unit, function, exception);
-        }
-
-        private void WriteAsyncData(byte[] write_data)
-        {
-            if (mSocket != null)
-            {
-                try
-                {
-                    mSocket.BeginSend(write_data, 0, write_data.Length, SocketFlags.None, new AsyncCallback(OnSend), null);
-                }
-                catch (SystemException)
-                {
-                    CallException(id, write_data[6], write_data[7], ExceptionCode.ConnectionLost);
-                }
-            }
-            else CallException(id, write_data[6], write_data[7], ExceptionCode.ConnectionLost);
-        }
-
-        private void OnSend(IAsyncResult result)
-        {
-            if (mSocket == null) return;
-
-            try
-            {
-                mSocket.EndSend(result);
-            }
-            catch (Exception) { }
         }
 
         private void OnReceived(IAsyncResult result)
@@ -157,16 +130,16 @@ namespace MODBUS_TCP
                 if (isTransactionID[mBuffer[0]] == true) isTransactionID[mBuffer[0]] = false;
 
                 if (result.IsCompleted == false) CallException(0xFF, 0xFF, 0xFF, ExceptionCode.ConnectionLost);
-                else OnResponseData(mBuffer.Clone());
+                else OnReceivedData((byte[])mBuffer.Clone());
 
-                Array.Clear(mBuffer, 0, mBuffer.lenght);
+                Array.Clear(mBuffer, 0, mBuffer.Length);
 
-                this.socket.BeginReceive(mBuffer, 0, mBuffer.Length, SocketFlags.None, new AsyncCallback(OnReceived), mSocket);
+                this.mSocket.BeginReceive(mBuffer, 0, mBuffer.Length, SocketFlags.None, new AsyncCallback(OnReceived), mSocket);
             }
             catch (Exception) { }
         }
 
-        private void WriteData(byte[] write_data)
+        public void WriteData(byte[] write_data)
         {
             if (mSocket.Connected)
             {
@@ -176,10 +149,10 @@ namespace MODBUS_TCP
                 }
                 catch (SystemException)
                 {
-                    CallException(id, write_data[6], write_data[7], ExceptionCode.ConnectionLost);
+                    CallException(write_data[0], write_data[6], write_data[7], ExceptionCode.ConnectionLost);
                 }
             }
-            else CallException(id, write_data[6], write_data[7], ExceptionCode.ConnectionLost);
+            else CallException(write_data[0], write_data[6], write_data[7], ExceptionCode.ConnectionLost);
         }
     }
 }
