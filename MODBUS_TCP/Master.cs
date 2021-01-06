@@ -29,8 +29,6 @@ namespace MODBUS_TCP
         private Socket mSocket;
         private byte[] mBuffer = new byte[2048];
 
-        private bool[] isTransactionID = new bool[65535];
-
         public delegate void ReceivedData(byte[] data);
         public event ReceivedData OnReceivedData;
 
@@ -125,18 +123,19 @@ namespace MODBUS_TCP
 
             try
             {
-                mSocket.EndReceive(result);
-
-                if (isTransactionID[mBuffer[0]] == true) isTransactionID[mBuffer[0]] = false;
-
                 if (result.IsCompleted == false) CallException(0xFF, 0xFF, 0xFF, ExceptionCode.ConnectionLost);
-                else OnReceivedData((byte[])mBuffer.Clone());
+                else
+                {
+                    mSocket.EndReceive(result);
 
-                Array.Clear(mBuffer, 0, mBuffer.Length);
+                    OnReceivedData((byte[])mBuffer.Clone());
 
-                this.mSocket.BeginReceive(mBuffer, 0, mBuffer.Length, SocketFlags.None, new AsyncCallback(OnReceived), mSocket);
+                    Array.Clear(mBuffer, 0, mBuffer.Length);
+
+                    this.mSocket.BeginReceive(mBuffer, 0, mBuffer.Length, SocketFlags.None, new AsyncCallback(OnReceived), mSocket);
+                }
             }
-            catch (Exception) { }
+            catch (Exception ex) { }
         }
 
         public void WriteData(byte[] write_data)

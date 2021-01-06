@@ -36,7 +36,7 @@ namespace MODBUS_TCP
 
         private static byte[] Create_PDU(byte slaveID, FunctionCode functionCode, ushort startADDr, ushort count)
         {
-            byte[] PDU_Return = new byte[5];
+            byte[] PDU_Return = new byte[6];
             PDU_Return[0] = slaveID;
             PDU_Return[1] = (byte)functionCode;
             Buffer.BlockCopy(BitConverter.GetBytes(startADDr), 0, PDU_Return, 2, 2);
