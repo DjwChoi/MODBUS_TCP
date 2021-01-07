@@ -135,7 +135,10 @@ namespace MODBUS_TCP
                     this.mSocket.BeginReceive(mBuffer, 0, mBuffer.Length, SocketFlags.None, new AsyncCallback(OnReceived), mSocket);
                 }
             }
-            catch (Exception ex) { }
+            catch (System.IO.IOException error)
+            {
+                throw (error);
+            }
         }
 
         public void WriteData(byte[] write_data)
