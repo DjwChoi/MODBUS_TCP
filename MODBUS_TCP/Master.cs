@@ -132,7 +132,7 @@ namespace MODBUS_TCP
 
                     Array.Clear(mBuffer, 0, mBuffer.Length);
 
-                    this.mSocket.BeginReceive(mBuffer, 0, mBuffer.Length, SocketFlags.None, new AsyncCallback(OnReceived), mSocket);
+                    mSocket.BeginReceive(mBuffer, 0, mBuffer.Length, SocketFlags.None, new AsyncCallback(OnReceived), mSocket);
                 }
             }
             catch (System.IO.IOException error)
